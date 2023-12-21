@@ -5,14 +5,14 @@ import pytesseract
 import cv2
 import re
 
+
 rus = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф',
        'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я']
 eng = ['A', 'B', 'V', 'G', 'D', 'E', '2', 'J', 'Z', 'I', 'Q', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F',
        'H', 'C', '3', '4', 'W', 'X', 'Y', '9', '6', '7', '8']
 
 
-def resize(img_path):
-    img = cv2.imread(img_path)
+def resize(img):
     final_wide = 1200
     r = float(final_wide) / img.shape[1]
     dim = (final_wide, int(img.shape[0] * r))
@@ -117,9 +117,7 @@ def download(image, filename):
 def catching(image):
     try:
         photo = resize(image)
-        pasp_read(photo)
-        print(pasdata)
-    except ValueError:
-        photo = cv2.imread(image)
-        pasp_read(photo)
-        print(pasdata)
+        return pasp_read(photo)
+    except Exception as e:
+        print(f"Ошибка обработки изображения: {e}")
+        return None

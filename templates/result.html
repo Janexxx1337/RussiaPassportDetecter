@@ -1,21 +1,19 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <title>Результаты</title>
+    <title>Результаты обработки</title>
 </head>
 <body>
-    <h2>Результаты обработки</h2>
+    <h1>Результаты:</h1>
     {% if result %}
-        <ul>
-            <li>Фамилия: {{ result['Surname'] }}</li>
-            <li>Имя: {{ result['Name'] }}</li>
-            <li>Отчество: {{ result['Mid'] }}</li>
-            <li>Дата: {{ result['Date'] }}</li>
-            <li>Серия: {{ result['Series'] }}</li>
-            <li>Номер: {{ result['Number'] }}</li>
-        </ul>
+        <p>Фамилия: {{ result['Surname'] }}</p>
+        <p>Имя: {{ result['Name'] }}</p>
+        <p>Отчество: {{ result['Mid'] }}</p>
+        <p>Дата рождения: {{ result['Date'] }}</p>
+        <p>Серия паспорта: {{ result['Series'] }}</p>
+        <p>Номер паспорта: {{ result['Number'] }}</p>
     {% else %}
-        <p>Нет результатов</p>
+        <p>Результаты не найдены.</p>
     {% endif %}
 </body>
 </html>

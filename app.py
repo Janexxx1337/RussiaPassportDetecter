@@ -1,8 +1,12 @@
 from flask import Flask, request, render_template
-import cv2
 import numpy as np
+import cv2
 import io
-import main as pasp_read  # Импорт модуля main
+import main
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -17,16 +21,21 @@ def upload_file():
 
         in_memory_file = io.BytesIO()
         file.save(in_memory_file)
-        in_memory_file.seek(0)  # Перемещение указателя в начало файла
-        data = np.frombuffer(in_memory_file.read(), dtype=np.uint8)  # Использование np.frombuffer
-        color_image_flag = 1
-        image = cv2.imdecode(data, color_image_flag)
+        data = np.frombuffer(in_memory_file.getvalue(), dtype=np.uint8)
+        image = cv2.imdecode(data, cv2.IMREAD_COLOR)
+        if image is None:
+            return 'Ошибка декодирования изображения', 400
 
-        photo = pasp_read.resize(image)  # Использование функции resize из модуля main
-        enhanced_photo = pasp_read.apply_clahe(photo)  # Предполагая, что функция apply_clahe также в main
-        result = pasp_read.pasp_read(enhanced_photo)  # Использование функции pasp_read из модуля main
-
-        return render_template('result.html', result=result)
+        try:
+            result = main.catching(image)
+            if result is not None:
+                # Передаем данные в HTML-шаблон
+                return render_template('result.html', result=result)
+            else:
+                return 'Ошибка обработки изображения', 500
+        except Exception as e:
+            app.logger.error(f'Ошибка обработки: {e}')
+            return 'Ошибка обработки изображения', 500
 
     return render_template('upload.html')
 
