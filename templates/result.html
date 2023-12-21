@@ -2,18 +2,56 @@
 <html>
 <head>
     <title>Результаты обработки</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item strong {
+            color: #333;
+        }
+        h2 {
+            color: #007bff;
+        }
+        .btn-secondary {
+            color: #fff;
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+    </style>
 </head>
 <body>
-    <h1>Результаты:</h1>
-    {% if result %}
-        <p>Фамилия: {{ result['Surname'] }}</p>
-        <p>Имя: {{ result['Name'] }}</p>
-        <p>Отчество: {{ result['Mid'] }}</p>
-        <p>Дата рождения: {{ result['Date'] }}</p>
-        <p>Серия паспорта: {{ result['Series'] }}</p>
-        <p>Номер паспорта: {{ result['Number'] }}</p>
-    {% else %}
-        <p>Результаты не найдены.</p>
-    {% endif %}
+    <div class="container">
+        <h2 class="mb-4 text-center">Результаты обработки</h2>
+        {% if result %}
+            <div class="result-item"><strong>Фамилия:</strong> {{ result['Surname'] }}</div>
+            <div class="result-item"><strong>Имя:</strong> {{ result['Name'] }}</div>
+            <div class="result-item"><strong>Отчество:</strong> {{ result['Mid'] }}</div>
+            <div class="result-item"><strong>Дата рождения:</strong> {{ result['Date'] }}</div>
+            <div class="result-item"><strong>Серия паспорта:</strong> {{ result['Series'] }}</div>
+            <div class="result-item"><strong>Номер паспорта:</strong> {{ result['Number'] }}</div>
+        {% else %}
+            <p>Результаты не найдены.</p>
+        {% endif %}
+        <a href="/" class="btn btn-secondary mt-4">Назад</a>
+    </div>
 </body>
 </html>

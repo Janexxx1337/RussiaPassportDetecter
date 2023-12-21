@@ -5,6 +5,7 @@ import io
 import main
 import logging
 
+
 # Настройка логирования
 logging.basicConfig(level=logging.DEBUG)
 

@@ -2,11 +2,20 @@
 <html>
 <head>
     <title>Загрузка изображения</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        input[type=file] { margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-    <form action="/" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Загрузить">
-    </form>
+    <div class="container">
+        <h2 class="mb-3">Загрузите изображение паспорта</h2>
+        <form action="/" method="post" enctype="multipart/form-data" class="mb-3">
+            <input type="file" name="file" class="form-control-file">
+            <button type="submit" class="btn btn-primary mt-2">Загрузить</button>
+        </form>
+    </div>
 </body>
 </html>
