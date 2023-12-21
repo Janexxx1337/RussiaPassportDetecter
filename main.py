@@ -20,6 +20,15 @@ def resize(img_path):
     return resized_img
 
 
+def remove_noise(image):
+    return cv2.medianBlur(image, 5)
+
+
+def correct_lighting(image, alpha=1.3, beta=40):
+    new_image = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
+    return new_image
+
+
 def apply_clahe(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -114,6 +123,3 @@ def catching(image):
         photo = cv2.imread(image)
         pasp_read(photo)
         print(pasdata)
-
-
-catching('img.png')

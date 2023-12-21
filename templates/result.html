@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Результаты</title>
+</head>
+<body>
+    <h2>Результаты обработки</h2>
+    {% if result %}
+        <ul>
+            <li>Фамилия: {{ result['Surname'] }}</li>
+            <li>Имя: {{ result['Name'] }}</li>
+            <li>Отчество: {{ result['Mid'] }}</li>
+            <li>Дата: {{ result['Date'] }}</li>
+            <li>Серия: {{ result['Series'] }}</li>
+            <li>Номер: {{ result['Number'] }}</li>
+        </ul>
+    {% else %}
+        <p>Нет результатов</p>
+    {% endif %}
+</body>
+</html>
