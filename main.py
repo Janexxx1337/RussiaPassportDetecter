@@ -4,13 +4,15 @@ import numpy as np
 import pytesseract
 import cv2
 import re
+import sys
 
+# Списки для замены букв между русским и английским алфавитами
 rus = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф',
        'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я']
 eng = ['A', 'B', 'V', 'G', 'D', 'E', '2', 'J', 'Z', 'I', 'Q', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F',
        'H', 'C', '3', '4', 'W', 'X', 'Y', '9', '6', '7', '8']
 
-
+# Функция для изменения размера изображения
 def resize(img):
     final_wide = 1200
     r = float(final_wide) / img.shape[1]
@@ -18,26 +20,26 @@ def resize(img):
     resized_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     return resized_img
 
-
+# Функция для удаления шума из изображения
 def remove_noise(image):
     return cv2.medianBlur(image, 5)
 
-
+# Функция для коррекции освещения изображения
 def correct_lighting(image, alpha=1.3, beta=40):
     new_image = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
     return new_image
 
-
+# Функция для применения CLAHE (Contrast Limited Adaptive Histogram Equalization)
 def apply_clahe(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     return clahe.apply(gray)
 
-
+# Функция для чтения паспорта (предположительно российского)
 def pasp_read(photo):
     image = photo
 
-    # Преобразование в градации серого для упрощения обработки
+    # Конвертация в градации серого
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     (H, W) = gray.shape
 
@@ -45,7 +47,7 @@ def pasp_read(photo):
     rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 7))
     sqKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 21))
 
-    # Гауссово размытие для сглаживания шума
+    # Гауссово размытие
     gray = cv2.GaussianBlur(gray, (3, 3), 0)
 
     # Выделение черных участков на светлом фоне
@@ -61,17 +63,17 @@ def pasp_read(photo):
     # Закрытие для соединения смежных элементов
     grad = cv2.morphologyEx(grad, cv2.MORPH_CLOSE, rectKernel)
 
-    # Пороговое преобразование для бинаризации изображения
+    # Пороговое преобразование
     thresh = cv2.threshold(grad, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
     thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, sqKernel)
     thresh = cv2.erode(thresh, None, iterations=2)
 
-    # Поиск контуров на изображении
+    # Поиск контуров
     cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     cnts = sort_contours(cnts, method="bottom-to-top")[0]
 
-    # Поиск MRZ на основе размеров контура
+    # Поиск MRZ
     mrzBox = None
     for c in cnts:
         (x, y, w, h) = cv2.boundingRect(c)
@@ -81,12 +83,12 @@ def pasp_read(photo):
             mrzBox = (x, y, w, h)
             break
 
-    # Обработка ситуации, когда MRZ не найден
+    # Обработка отсутствия MRZ
     if mrzBox is None:
         print("[INFO] MRZ could not be found")
         sys.exit(0)
 
-    # Выделение и коррекция области MRZ
+    # Выделение MRZ
     (x, y, w, h) = mrzBox
     pX = int((x + w) * 0.03)
     pY = int((y + h) * 0.083)
@@ -94,11 +96,11 @@ def pasp_read(photo):
     (w, h) = (w + (pX * 2), h + (pY * 2))
     mrz = image[y:y + h, x:x + w]
 
-    # Использование OCR для извлечения текста из MRZ
+    # OCR
     config = (" --oem 3 --psm 6 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789><")
     mrzText = pytesseract.image_to_string(mrz, lang='eng', config=config)
 
-    # Обработка и структурирование извлеченных данных
+    # Обработка текста
     mrzText = mrzText.replace(" ", "")
     mrzText = mrzText.split()
     if mrzText[0][0:1] != 'P':
@@ -129,16 +131,15 @@ def pasp_read(photo):
     else:
         data = '20' + data
     data = data[6:8] + '.' + data[4:6] + '.' + data[0:4]
-    global pasdata
     pasdata = {'Surname': surname, 'Name': name, 'Mid': otch, 'Date': data, 'Series': seria, 'Number': nomer}
     return pasdata
 
-
+# Функция для сохранения изображения
 def download(image, filename):
     resize(image)
     cv2.imwrite(filename, photo)
 
-
+# Функция для обработки исключений при чтении паспорта
 def catching(image):
     try:
         photo = resize(image)
